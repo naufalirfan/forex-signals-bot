@@ -2,7 +2,7 @@ services:
   - type: web
     name: forex-signals-api
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements-api.txt
     startCommand: gunicorn server:app
     envVars:
       - key: PYTHON_VERSION
