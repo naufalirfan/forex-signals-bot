@@ -127,14 +127,29 @@ function handleTabChange(tab) {
     }
 }
 
+// API Configuration
+const API_URL = 'https://forex-signals-api.onrender.com';
+
 // Load Signals
 async function loadSignals() {
     showLoading();
 
-    // Use sample data for static hosting (GitHub Pages)
-    // Untuk data real-time, gunakan server backend
-    signals = sampleSignals;
+    // Try to fetch from API if configured
+    if (API_URL) {
+        try {
+            const response = await fetch(`${API_URL}/api/signals`);
+            if (response.ok) {
+                signals = await response.json();
+                renderSignals();
+                return;
+            }
+        } catch (error) {
+            console.log('API not available, using sample data');
+        }
+    }
 
+    // Fallback to sample data
+    signals = sampleSignals;
     renderSignals();
 }
 
