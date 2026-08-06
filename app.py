@@ -166,19 +166,20 @@ def clear_signals():
     return jsonify({"status": "ok", "message": "All signals cleared"})
 
 
-if __name__ == '__main__':
-    # Initialize with sample signals if empty
-    if not load_signals():
-        sample_signals = [
-            generate_signal("XAUUSD", "M1", "SELL"),
-            generate_signal("EURUSD", "M5", "BUY"),
-            generate_signal("GBPUSD", "M15", "SELL"),
-            generate_signal("USDJPY", "M5", "BUY"),
-            generate_signal("BTCUSD", "H1", "BUY"),
-        ]
-        save_signals(sample_signals)
-        logger.info("Initialized with sample signals")
+# Initialize sample signals on startup
+if not load_signals():
+    sample_signals = [
+        generate_signal("XAUUSD", "M1", "SELL"),
+        generate_signal("EURUSD", "M5", "BUY"),
+        generate_signal("GBPUSD", "M15", "SELL"),
+        generate_signal("USDJPY", "M5", "BUY"),
+        generate_signal("BTCUSD", "H1", "BUY"),
+    ]
+    save_signals(sample_signals)
+    logger.info("Initialized with sample signals")
 
+
+if __name__ == '__main__':
     port = int(os.getenv("PORT", 8080))
     logger.info(f"Starting API server on port {port}")
     app.run(host='0.0.0.0', port=port, debug=False)
