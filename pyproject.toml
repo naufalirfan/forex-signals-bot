@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "forex-signals-api"
+version = "1.0.0"
+description = "Forex Signals Trading API"
+authors = ["Developer"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "3.0.0"
+flask-cors = "4.0.0"
+python-dotenv = "1.0.0"
+gunicorn = "21.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
