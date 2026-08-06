@@ -19,6 +19,8 @@ CORS(app)
 
 SIGNALS_FILE = os.path.join(os.path.dirname(__file__), "signals.json")
 
+TIMEFRAMES = ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"]
+
 def load_signals():
     if os.path.exists(SIGNALS_FILE):
         with open(SIGNALS_FILE, "r") as f:
@@ -45,10 +47,29 @@ def generate_signal(symbol, timeframe, signal_type):
 
     if base > 1000:
         spread = 5.0
+        sl_mult = 3.0
+        tp_mult = 2.0
     elif base > 100:
-        spread = 0.01
-    else:
         spread = 0.5
+        sl_mult = 3.0
+        tp_mult = 2.0
+    elif base > 10:
+        spread = 0.05
+        sl_mult = 3.0
+        tp_mult = 2.0
+    else:
+        spread = 0.005
+        sl_mult = 3.0
+        tp_mult = 2.0
+
+    entry = round(base + spread * random.uniform(-0.5, 0.5), 3)
+
+    if signal_type == "SELL":
+        tp = round(entry - spread * tp_mult * random.uniform(1.0, 2.0), 3)
+        sl = round(entry + spread * sl_mult * random.uniform(1.0, 1.5), 3)
+    else:
+        tp = round(entry + spread * tp_mult * random.uniform(1.0, 2.0), 3)
+        sl = round(entry - spread * sl_mult * random.uniform(1.0, 1.5), 3)
 
     sell_zone = {
         "rec1": {
@@ -80,12 +101,18 @@ def generate_signal(symbol, timeframe, signal_type):
         }
     }
 
+    risk_reward = round(abs(tp - entry) / abs(sl - entry), 2) if abs(sl - entry) > 0 else 1.0
+
     return {
         "id": int(datetime.now().timestamp() * 1000),
         "symbol": symbol,
         "timeframe": timeframe,
         "type": signal_type,
         "confirmation": signal_type if random.random() > 0.3 else "WAIT",
+        "entry": entry,
+        "takeProfit": tp,
+        "stopLoss": sl,
+        "riskReward": risk_reward,
         "sellZone": sell_zone,
         "buyZone": buy_zone,
         "active": True,
@@ -98,6 +125,7 @@ def home():
     return jsonify({
         "name": "Forex Signals API",
         "version": "1.0.0",
+        "timeframes": TIMEFRAMES,
         "endpoints": {
             "GET /api/signals": "Get all signals",
             "POST /api/signals": "Add new signal",
@@ -129,8 +157,11 @@ def add_signal():
         return jsonify({"error": "Missing required fields: symbol, type"}), 400
 
     symbol = data['symbol'].upper()
-    timeframe = data.get('timeframe', 'M1').upper()
+    timeframe = data.get('timeframe', 'M15').upper()
     signal_type = data['type'].upper()
+
+    if timeframe not in TIMEFRAMES:
+        return jsonify({"error": f"Invalid timeframe. Use: {', '.join(TIMEFRAMES)}"}), 400
 
     if signal_type not in ['BUY', 'SELL']:
         return jsonify({"error": "Type must be BUY or SELL"}), 400
@@ -169,14 +200,21 @@ def clear_signals():
 # Initialize sample signals on startup
 if not load_signals():
     sample_signals = [
-        generate_signal("XAUUSD", "M1", "SELL"),
+        generate_signal("XAUUSD", "M15", "SELL"),
+        generate_signal("XAUUSD", "H1", "BUY"),
         generate_signal("EURUSD", "M5", "BUY"),
+        generate_signal("EURUSD", "H4", "SELL"),
         generate_signal("GBPUSD", "M15", "SELL"),
-        generate_signal("USDJPY", "M5", "BUY"),
-        generate_signal("BTCUSD", "H1", "BUY"),
+        generate_signal("GBPUSD", "D1", "BUY"),
+        generate_signal("USDJPY", "M30", "BUY"),
+        generate_signal("USDJPY", "H1", "SELL"),
+        generate_signal("BTCUSD", "H4", "BUY"),
+        generate_signal("BTCUSD", "D1", "SELL"),
+        generate_signal("ETHUSD", "M5", "BUY"),
+        generate_signal("ETHUSD", "W1", "SELL"),
     ]
     save_signals(sample_signals)
-    logger.info("Initialized with sample signals")
+    logger.info("Initialized with 12 sample signals")
 
 
 if __name__ == '__main__':

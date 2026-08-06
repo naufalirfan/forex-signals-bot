@@ -203,6 +203,59 @@ body {
     font-weight: 600;
 }
 
+/* Entry / TP / SL / RR */
+.entry-sl-tp {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 0.7fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.stat-box {
+    background: var(--bg-input);
+    padding: 10px 8px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.stat-box.tp {
+    border-color: rgba(0, 210, 106, 0.3);
+    background: rgba(0, 210, 106, 0.08);
+}
+
+.stat-box.sl {
+    border-color: rgba(255, 71, 87, 0.3);
+    background: rgba(255, 71, 87, 0.08);
+}
+
+.stat-box.rr {
+    border-color: rgba(88, 166, 255, 0.3);
+    background: rgba(88, 166, 255, 0.08);
+}
+
+.stat-label {
+    font-size: 9px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.tp-value {
+    color: var(--accent-green);
+}
+
+.sl-value {
+    color: var(--accent-red);
+}
+
 .signal-type {
     display: flex;
     align-items: center;
