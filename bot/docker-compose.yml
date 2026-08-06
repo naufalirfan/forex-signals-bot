@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  forex-signals-bot:
+    build: .
+    container_name: forex-signals-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./signals.json:/app/signals.json
